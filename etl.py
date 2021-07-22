@@ -6,6 +6,17 @@ from sql_queries import *
 
 
 def process_song_file(cur, filepath):
+    """
+    Description : This function extracts the data in song_data files and loads it into the corresponding tables.
+    It starts by turning the json file into a pandas data frame. 
+    It then selects what columns are to be inserted in the songs table and inserts them using the SQL query defined for that purpose in sql_queries.py.
+    It then does the same for the artists data and table.
+    
+    Arguments :
+        cur : the cursor object.
+        filepath : song_data filepath.
+ 
+    """
     # open song file
     df = pd.read_json(filepath,dtype=True,lines=True)
 
@@ -19,6 +30,17 @@ def process_song_file(cur, filepath):
 
 
 def process_log_file(cur, filepath):
+    """
+    Description : This function extracts the data in log_data files, transforms and inserts it into the corresponding tables.
+    It starts by turning the json file into a pandas data frame. It then filters that data to have only logs corresponding to NextSong actions.
+    It then converts the timestamp into different datetime formats and inserts those into the times table using the SQL query defined for that purpose in sql_queries.py.
+    It then does the same for the users and songplays data and tables.
+    
+    Arguments :
+        cur : the cursor object.
+        filepath : log_data filepath.
+    
+    """
     # open log file
     df = pd.read_json(filepath,dtype=True,lines=True)
 
@@ -62,6 +84,20 @@ def process_log_file(cur, filepath):
 
 
 def process_data(cur, conn, filepath, func):
+    """
+    Description: This function lists the files in a directory, and then executes the ETL function for each of them.
+
+    Arguments:
+        cur: the cursor object.
+        conn: connection to the database.
+        filepath: directory filepath.
+        func: ETL function.
+
+    Returns:
+        The number of files found in the directory.
+        The number of files that have been processed by the ETL function out of all files in the directory, every time a file has been processed.
+        
+    """
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):
@@ -81,6 +117,10 @@ def process_data(cur, conn, filepath, func):
 
 
 def main():
+    """
+    Description: This function connects to the sparkify database and executes the function that lists each file in the the song_data and log_data directories and does the ETL on them. 
+    
+    """
     conn = psycopg2.connect("host=127.0.0.1 dbname=sparkifydb user=student password=student")
     cur = conn.cursor()
 
